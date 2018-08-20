@@ -1,8 +1,51 @@
-var solidityContract;
+var nationalCollapse;
+var userAccount;
 
 function startApp() {
-  var solidityContractAddress = "YOUR_CONTRACT_ADDRESS";
-  solidityContract = new web3js.eth.Contract(solidityContractABI, solidityContractAddress);
+  var nationalCollapseAddress = "YOUR_CONTRACT_ADDRESS";
+  nationalCollapse = new web3js.eth.Contract(nationalCollapseABI, nationalCollapseAddress);
+
+  var accountInterval = setInterval(function() {
+    // Check if account has changed
+    if (web3.eth.accounts[0] !== userAccount) {
+      userAccount = web3.eth.accounts[0];
+      // Call some function to update the UI with the new account
+      //updateInterface();
+    }
+  }, 100);
+}
+
+function createNation(name, govTypeVal) {
+  // This is going to take a while, so update the UI to let the user know
+  // the transaction has been sent
+  console.log("Creating new nation on the blockchain.");
+  // Send the tx to our contract:
+  return nationalCollapse.methods.createNation(name, govTypeVal)
+  .send({ from: userAccount })
+  .on("receipt", function(receipt) {
+    console.log("Successfully created " govTypeVal + "of " + name + ".");
+    // Transaction was accepted into the blockchain, let's redraw the UI
+  })
+  .on("error", function(error) {
+    // Do something to alert the user their transaction has failed
+    console.log(error);
+  });
+}
+
+function updatePopulation() {
+  console.log("Updating population.");
+  return nationalCollapse.methods.updatePopulation()
+  .send({ from: userAccount })
+  .on("receipt", function(receipt) {
+    console.log("Population is now " + getNationDetails().population + "K.");
+  })
+  .on("error", function(error) {
+    console.log(error);
+  });
+}
+
+function getNationDetails() {
+ return nationalCollapse.methods.ownerToNation(userAccount).call()
 }
 
 window.addEventListener('load', function() {
