@@ -33,19 +33,15 @@ function createNation(name, govTypeVal) {
 }
 
 function updatePopulation() {
-  console.log("Updating population.");
-  return nationalCollapse.methods.updatePopulation()
-  .send({ from: userAccount })
-  .on("receipt", function(receipt) {
-    console.log("Population is now " + getNationDetails().population + "K.");
-  })
-  .on("error", function(error) {
-    console.log(error);
-  });
+  return nationalCollapse.methods.getPopulation(userAccount).call()
+}
+
+function updateManpower() {
+  return nationalCollapse.methods.getManpower(userAccount).call()
 }
 
 function getNationDetails() {
- return nationalCollapse.methods.ownerToNation(userAccount).call()
+  return nationalCollapse.methods.ownerToNation(userAccount).call()
 }
 
 window.addEventListener('load', function() {
